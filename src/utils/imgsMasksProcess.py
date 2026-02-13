@@ -86,9 +86,9 @@ def buildTasks(imagesUEFolderPath, masksUEFolderPath ,imagesFolderPath, masksFol
 
 
 if __name__ == "__main__":
-    imagesUEFolderPath = "../../dataset/trainDataset/imagesUE"
-    masksUEFolderPath = "../../dataset/trainDataset/masksUE"
-    imagesFolderPath = "../../dataset/trainDataset/images"
-    masksFolderPath = "../../dataset/trainDataset/masks"
+    imagesUEFolderPath = "../dataset/trainDataset/imagesUE"
+    masksUEFolderPath = "../dataset/trainDataset/masksUE"
+    imagesFolderPath = "../dataset/trainDataset/images"
+    masksFolderPath = "../dataset/trainDataset/masks"
     processFolders(imagesUEFolderPath, masksUEFolderPath ,imagesFolderPath, masksFolderPath, os.cpu_count())
 
