@@ -5,22 +5,8 @@ from tqdm import tqdm
 
 
 from concurrent.futures import ProcessPoolExecutor
+from camera_pose.utils.palette import exactColorPalette, rangeColorPalette
 
-exactColorPalette = {
-    (0, 0, 0): 0,       # Background
-    (255, 0, 0): 1,     # Class 1
-    (0, 255, 0): 2,     # Class 2
-    (0, 0, 255): 3,     # Class 3
-    (255, 255, 0): 4,   # Class 4
-    (255, 0, 255): 5,   # Class 5
-    (0, 255, 255): 6,   # Class 6
-}
-
-rangeColorPalette = {
-    "class7": {"range": ((183,189), (0,0), (250,255)), "classIndex": 7}, # Class 7 needs to be range
-    "class8": {"range": ((200,255), (113,192), (0,0)), "classIndex": 8}, # Class 8 needs to be range
-    "class9": {"range": ((0,0), (221,255), (162,189)), "classIndex": 9} # Class 9 needs to be range
-}
 
 def dataProcess(args):
 
@@ -86,9 +72,10 @@ def buildTasks(imagesUEFolderPath, masksUEFolderPath ,imagesFolderPath, masksFol
 
 
 if __name__ == "__main__":
-    imagesUEFolderPath = "../dataset/trainDataset/imagesUE"
-    masksUEFolderPath = "../dataset/trainDataset/masksUE"
-    imagesFolderPath = "../dataset/trainDataset/images"
-    masksFolderPath = "../dataset/trainDataset/masks"
-    processFolders(imagesUEFolderPath, masksUEFolderPath ,imagesFolderPath, masksFolderPath, os.cpu_count())
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+    imagesUEFolderPath = os.path.join(base_dir, "camera_pose/dataset/trainDataset/imagesUE")
+    masksUEFolderPath = os.path.join(base_dir, "camera_pose/dataset/trainDataset/masksUE")
+    imagesFolderPath = os.path.join(base_dir, "camera_pose/dataset/trainDataset/images")
+    masksFolderPath = os.path.join(base_dir, "camera_pose/dataset/trainDataset/masks")
+    processFolders(imagesUEFolderPath, masksUEFolderPath, imagesFolderPath, masksFolderPath, os.cpu_count())
 

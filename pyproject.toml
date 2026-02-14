@@ -1,0 +1,7 @@
+[project]
+name = "camera_pose"
+version = "0.1.0"
+
+dependencies = [
+    "tqdm==4.67.3"
+]
