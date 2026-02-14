@@ -66,7 +66,7 @@ def main(img_path, mask_path, num_classes, batch_size, num_epochs):
         val_average_loss = val_loss / (index + 1)
         scheduler.step()
         
-        print(f'Epoch: {epoch / num_epochs}, train_loss: {train_average_loss}, val_loss: {val_average_loss}, lr: {scheduler.get_last_lr()[0]}') 
+        print(f'Epoch: {epoch} / {num_epochs}, train_loss: {train_average_loss}, val_loss: {val_average_loss}, lr: {scheduler.get_last_lr()[0]}') 
 
     torch.save(model.state_dict(), 'unet_model.pth')
     print('model saved as unet_model.pth') 
