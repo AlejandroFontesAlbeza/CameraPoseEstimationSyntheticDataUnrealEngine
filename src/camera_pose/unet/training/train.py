@@ -30,7 +30,7 @@ def main(img_path, mask_path, num_classes, batch_size, num_epochs):
     model = Unet(in_channels=3, num_classes=num_classes).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.8)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=25, gamma=0.8)
 
     for epoch in range(num_epochs):
         model.train()
@@ -77,4 +77,4 @@ if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
     img_path = os.path.join(base_dir, "camera_pose/dataset/trainDataset/images")
     mask_path = os.path.join(base_dir, "camera_pose/dataset/trainDataset/masks")
-    main(img_path=img_path, mask_path=mask_path, num_classes=10, batch_size=2, num_epochs=20)
+    main(img_path=img_path, mask_path=mask_path, num_classes=10, batch_size=2, num_epochs=50)
