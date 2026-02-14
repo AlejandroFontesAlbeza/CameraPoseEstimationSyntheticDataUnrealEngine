@@ -70,6 +70,7 @@ def main(img_path, mask_path, num_classes, batch_size, num_epochs):
 
     torch.save(model.state_dict(), 'unet_model.pth')
     print('model saved as unet_model.pth') 
+    print("prueba para comprobar que no esta tracked egg-info")
 
 
 
