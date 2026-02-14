@@ -1,5 +1,8 @@
-dataset/
+datasetReal/
+datasetSynthetic/
+tennisMatch/
 venv/
 __pycache__/
 *.egg-info/
 unet_model.pth
+seguimiento.md

@@ -14,8 +14,8 @@ class CustomDataset(Dataset):
         self.mask_dir = mask_dir
         self.img_transform = img_transform
 
-        self.img_files = sorted([f for f in os.listdir(img_dir)])
-        self.masks_files = sorted([f for f in os.listdir(mask_dir)])
+        self.img_files = sorted([f for f in os.listdir(img_dir) if f.endswith(('.png', '.jpg', '.jpeg'))])
+        self.masks_files = sorted([f for f in os.listdir(mask_dir) if f.endswith(('.png', '.jpg', '.jpeg'))])
 
     def __len__(self):
         return len(self.img_files)

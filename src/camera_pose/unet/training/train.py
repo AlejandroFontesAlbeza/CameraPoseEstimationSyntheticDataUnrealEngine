@@ -77,4 +77,4 @@ if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
     img_path = os.path.join(base_dir, "camera_pose/dataset/trainDataset/images")
     mask_path = os.path.join(base_dir, "camera_pose/dataset/trainDataset/masks")
-    main(img_path=img_path, mask_path=mask_path, num_classes=10, batch_size=2, num_epochs=50)
+    main(img_path=img_path, mask_path=mask_path, num_classes=10, batch_size=2, num_epochs=100)
