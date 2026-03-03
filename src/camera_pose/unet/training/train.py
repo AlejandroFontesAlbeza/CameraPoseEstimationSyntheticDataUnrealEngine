@@ -8,19 +8,22 @@ from tqdm import tqdm
 import os
 
 
-def main(img_path, mask_path, num_classes, batch_size, num_epochs):
+def main(train_img_path, valid_img_path, train_mask_path, valid_mask_path, num_classes, batch_size, num_epochs):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('Training on:', device)
 
     img_transform = transforms.Compose([
         transforms.Resize((512, 512)),
+        transforms.RandomApply([
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        ], p=0.25),
+        transforms.RandomGrayscale(p=0.25),
         transforms.ToTensor(),
     ])
 
-    dataset = CustomDataset(img_path, mask_path, img_transform)
-    generator = torch.Generator().manual_seed(42)
-    train_dataset, val_dataset = random_split(dataset, [0.6,0.4], generator=generator)
+    train_dataset = CustomDataset(train_img_path, train_mask_path, img_transform)
+    val_dataset = CustomDataset(valid_img_path, valid_mask_path, img_transform)
 
     batch_size = batch_size
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
@@ -75,6 +78,11 @@ def main(img_path, mask_path, num_classes, batch_size, num_epochs):
 
 if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
-    img_path = os.path.join(base_dir, "camera_pose/dataset/trainDataset/images")
-    mask_path = os.path.join(base_dir, "camera_pose/dataset/trainDataset/masks")
-    main(img_path=img_path, mask_path=mask_path, num_classes=10, batch_size=2, num_epochs=100)
+    train_img_path = os.path.join(base_dir, "camera_pose/datasetStructuredSynthetic/train/images")
+    train_mask_path = os.path.join(base_dir, "camera_pose/datasetStructuredSynthetic/train/masks")
+    valid_img_path = os.path.join(base_dir, "camera_pose/datasetStructuredSynthetic/valid/images")
+    valid_mask_path = os.path.join(base_dir, "camera_pose/datasetStructuredSynthetic/valid/masks")
+
+    main(train_img_path=train_img_path, valid_img_path=valid_img_path,
+        train_mask_path=train_mask_path, valid_mask_path=valid_mask_path,
+        num_classes=10, batch_size=2, num_epochs=100)

@@ -1,5 +1,7 @@
 datasetReal/
-datasetSynthetic/
+datasetMergeSynthetic/
+datasetStructuredSynthetic/
+renderUE/
 tennisMatch/
 venv/
 __pycache__/
