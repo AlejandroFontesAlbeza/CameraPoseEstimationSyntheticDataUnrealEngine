@@ -36,11 +36,11 @@ def main(train_img_path, valid_img_path, train_mask_path, valid_mask_path, num_c
         None
     else:
         print('Finetuning, loading model path')
-        model.load_state_dict(torch.load('modelVersions/unet_modelV0.pth', map_location=device))
+        model.load_state_dict(torch.load('modelVersions/unet_modelV1.pth', map_location=device))
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.8)
+    #scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.8)
 
     for epoch in range(num_epochs):
         model.train()
@@ -74,11 +74,11 @@ def main(train_img_path, valid_img_path, train_mask_path, valid_mask_path, num_c
                 val_loss += loss.item()
 
         val_average_loss = val_loss / (index + 1)
-        scheduler.step()
+        #scheduler.step()
         
-        print(f'Epoch: {epoch} / {num_epochs}, train_loss: {train_average_loss}, val_loss: {val_average_loss}, lr: {scheduler.get_last_lr()[0]}') 
+        print(f'Epoch: {epoch} / {num_epochs}, train_loss: {train_average_loss}, val_loss: {val_average_loss}, lr: {optimizer.param_groups[0]["lr"]}') 
 
-    torch.save(model.state_dict(), 'modelVersions/unet_modelV1.pth')
+    torch.save(model.state_dict(), 'modelVersions/unet_modelV2.pth')
     print('model saved') 
 
 
@@ -92,4 +92,4 @@ if __name__ == "__main__":
 
     main(train_img_path=train_img_path, valid_img_path=valid_img_path,
         train_mask_path=train_mask_path, valid_mask_path=valid_mask_path,
-        num_classes=10, batch_size=2, num_epochs=25, finetuning=True)
+        num_classes=10, batch_size=2, num_epochs=20, finetuning=True)
