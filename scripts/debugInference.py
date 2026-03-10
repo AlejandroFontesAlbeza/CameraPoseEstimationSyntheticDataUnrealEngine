@@ -8,6 +8,7 @@ from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
 import cv2
+from scipy.spatial.transform import Rotation as Rot
 
 
 import torch
@@ -32,9 +33,10 @@ def inference(model_path, input_path):
     ])
 
     img = Image.open(input_path).convert("RGB")
+    img_np = np.array(img)
+    width, height = img.size
+    print(f"Input image size: {img.size}")
     input_tensor = transform(img).unsqueeze(0).to(device)
-    img_resize = np.array(img.resize((512, 512)))
-    img_np = np.array(img_resize)
     
     with torch.no_grad():
         for _ in range(2):
@@ -47,46 +49,80 @@ def inference(model_path, input_path):
         end = time.time()
         print(f'Inference time: {end-start}')
 
-    prediced_mask = torch.argmax(output, dim=1).squeeze().cpu().numpy()
-    predicted_mask_color = np.zeros((prediced_mask.shape[0], prediced_mask.shape[1], 3), dtype=np.uint8)
-    predicted_mask_lines = np.zeros((prediced_mask.shape[0], prediced_mask.shape[1], 3), dtype=np.uint8)
+    predicted_mask = torch.argmax(output, dim=1).squeeze().cpu().numpy()
+    predicted_mask_resized = cv2.resize(predicted_mask.astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST)
+    predicted_mask_color = np.zeros((height, width, 3), dtype=np.uint8)
+
+
     lines = {}
-    intersections_lines = {1: (1,6),
-                           2: (1,7),
-                           3: (1,8),
-                           4: (1,9),
-                           5: (2,6),
-                           6: (2,7),
-                           7: (2,8),
-                           8: (2,9),
-                           9: (3,6),
-                           10: (3,7),
-                           11: (3,8),
-                           12: (3,9),
-                           13: (4,6),
-                           14: (4,7),
-                           15: (4,8),
-                           16: (4,9),
-                           17: (5,6),
-                           18: (5,7),
-                           19: (5,8),
-                           20: (5,9)}
+    intersections_lines = {
+        1: (1,6),
+        2: (1,7),
+        3: (1,8),
+        4: (1,9),
+        5: (2,6),
+        6: (2,7),
+        7: (2,8),
+        8: (2,9),
+        9: (3,6),
+        10: (3,7),
+        11: (3,8),
+        12: (3,9),
+        13: (4,6),
+        14: (4,7),
+        15: (4,8),
+        16: (4,9),
+        17: (5,6),
+        18: (5,7),
+        19: (5,8),
+        20: (5,9)
+    }
     intersections = {}
+
+    real_intersections = {
+        1: (-5.485, -11.885),
+        2: (-5.485, -6.4),
+        3: (-5.485, 6.4),
+        4: (-5.485, 11.885),
+        5: (-4.115, -11.885),
+        6: (-4.115, -6.4),
+        7: (-4.115, 6.4),
+        8: (-4.115, 11.885),
+        9: (0.0, -11.885),
+        10: (0.0, -6.4),
+        11: (0.0, 6.4),
+        12: (0.0, 11.885),
+        13: (4.115, -11.885),
+        14: (4.115, -6.4),
+        15: (4.115, 6.4),
+        16: (4.115, 11.885),
+        17: (5.485, -11.885),
+        18: (5.485, -6.4),
+        19: (5.485, 6.4),
+        20: (5.485, 11.885)
+    }
 
 
     for classIndex, color in inferenceColorPalette.items():
-        predicted_mask_color[prediced_mask == classIndex] = color
-        contours,_ = cv2.findContours((prediced_mask == classIndex).astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-        min_contour_length = 100
-        valid_contours = [c for c in contours if cv2.contourArea(c) > min_contour_length]
+        mask = (predicted_mask_resized == classIndex)
+        predicted_mask_color[mask] = color
 
-        [vx,vy,x,y] = cv2.fitLine(valid_contours[0], cv2.DIST_L2,0,0.01,0.01)
+    for classIndex, color in inferenceColorPalette.items():
+        mask_binary = (predicted_mask_resized == classIndex).astype(np.uint8)
+
+        if np.count_nonzero(mask_binary) < 100:  # Evita clases pequeñas
+            continue
+        contours, _ = cv2.findContours(mask_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if len(contours) == 0:
+            continue
+
+        contour = max(contours, key=cv2.contourArea)
+
+        [vx,vy,x,y] = cv2.fitLine(contour, cv2.DIST_L2,0,0.01,0.01)
         vx,vy,x,y = vx.item(), vy.item(), x.item(), y.item() # Convert to Python scalars
         lines[classIndex] = (vx, vy, x, y)
 
-        cv2.line(predicted_mask_lines, (int(x - vx*1000), int(y - vy*1000)), (int(x + vx*1000), int(y + vy*1000)), color, 2)
-
+        cv2.line(img_np, (int(x - vx*1000), int(y - vy*1000)), (int(x + vx*1000), int(y + vy*1000)), color, 4)        
     
     for index , (c1,c2) in intersections_lines.items():
         if c1 in lines and c2 in lines:
@@ -101,20 +137,77 @@ def inference(model_path, input_path):
             Or next: """
             x_int = int(x2 + vx2 * s)
             y_int = int(y2 + vy2 * s)
-            intersections[(c1,c2)] = (x_int, y_int)
+            intersections[index] = (x_int, y_int)
 
-            cv2.circle(predicted_mask_lines, (int(x_int), int(y_int)), 5, (255,255,255), -1)
-            cv2.putText(predicted_mask_lines, f'{index}', (int(x_int)+5, int(y_int)-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+            cv2.circle(img_np, (int(x_int), int(y_int)), 8, (255,255,255), -1)
+            cv2.putText(img_np, f'{index}', (int(x_int)+10, int(y_int)-10), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,0), 2)
+    
 
+    number_intersecctions = sorted(set(intersections.keys() & real_intersections.keys()))
+
+    img_pts = np.array([intersections[i] for i in number_intersecctions])
+    real_pts = np.array([real_intersections[i] for i in number_intersecctions])
+
+    if len(number_intersecctions) >= 4:
+        H, _ = cv2.findHomography(img_pts, real_pts)
+        print("Homography matrix:\n", H)
 
     
+
+    FOV_x_deg = 46.73  # FOV horizontal
+    FOV_x = np.deg2rad(FOV_x_deg)
+    fx = (width / 2) / np.tan(FOV_x / 2)
+
+    # Calcula fy usando la relación de aspecto
+    aspect_ratio = width / height
+    fy = fx / aspect_ratio
+
+    cx = width / 2
+    cy = height / 2
+    K = np.array([[fx, 0, cx],
+                [0, fy, cy],
+                [0, 0, 1]], dtype=np.float32)
+    
+
+    H_NORM = H / np.linalg.norm(H[:,0])
+    K_inv = np.linalg.inv(K)
+
+    h1 = H_NORM[:,0]
+    h2 = H_NORM[:,1]
+    h3 = H_NORM[:,2]
+
+    r1 = K_inv @ h1
+    r2 = K_inv @ h2
+    t = K_inv @ h3
+
+    L = 1 / np.linalg.norm(r1)
+    r1 *= L
+    r2 *= L
+    t *= L
+
+    r3 = np.cross(r1, r2)
+    R = np.column_stack((r1, r2, r3))
+
+    U, _, Vt = np.linalg.svd(R)
+    R = U @ Vt
+
+    R_wc = R.T
+    C = -R.T @ t
+    camPosition = C.flatten()
+    print(np.round(camPosition,2))
+
+    rot = Rot.from_matrix(R_wc)
+    rx,ry,rz = rot.as_euler('xyz', degrees = True)
+    rx, ry, rz = np.round([rx, ry, rz], 2)
+    print(rx, ry, rz)
+
+
+
     plt.figure(figsize=(12, 6))
-    plt.subplot(1,3,1)
+    plt.subplot(1,2,1)
     plt.imshow(img_np)
-    plt.subplot(1,3,2)
+    plt.subplot(1,2,2)
     plt.imshow(predicted_mask_color)
-    plt.subplot(1,3,3)
-    plt.imshow(predicted_mask_lines)
     plt.show()
 
 
@@ -123,5 +216,5 @@ def inference(model_path, input_path):
 if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
     model_path = os.path.join(base_dir, "models/unet_modelV2.pth")
-    input_path = os.path.join(base_dir, "data/tennisMatch/output/frames2215.png")
+    input_path = os.path.join(base_dir, "data/dataset/test/render11frame0000.png")
     inference(model_path, input_path=input_path)
