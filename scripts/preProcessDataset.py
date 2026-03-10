@@ -22,6 +22,13 @@ def process_folders(images_ue_folder, masks_ue_folder, images_out_folder, masks_
     """
     Procesa todas las imágenes y máscaras usando múltiples procesos.
     """
+
+    if not os.path.exists(images_out_folder):
+        os.makedirs(images_out_folder)
+    if not os.path.exists(masks_out_folder):
+        os.makedirs(masks_out_folder)
+
+
     tasks = build_tasks(images_ue_folder, masks_ue_folder, images_out_folder, masks_out_folder)
     with ProcessPoolExecutor(max_workers=num_workers) as executor:
         list(
