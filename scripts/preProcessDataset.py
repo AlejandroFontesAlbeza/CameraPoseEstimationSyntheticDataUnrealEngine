@@ -45,5 +45,5 @@ if __name__ == "__main__":
     masks_ue_folder = os.path.join(base_dir, "data/renderUE/masks/")
     images_out_folder = os.path.join(base_dir, "data/datasetPreProcessed/images")
     masks_out_folder = os.path.join(base_dir, "data/datasetPreProcessed/masks")
-    process_folders(images_ue_folder, masks_ue_folder, images_out_folder, masks_out_folder, (os.cpu_count()//2))
+    process_folders(images_ue_folder, masks_ue_folder, images_out_folder, masks_out_folder, os.cpu_count())
 
