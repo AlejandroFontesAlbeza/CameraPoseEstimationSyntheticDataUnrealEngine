@@ -149,18 +149,17 @@ def inference(model_path, input_path):
     real_pts = np.array([real_intersections[i] for i in number_intersecctions])
 
     if len(number_intersecctions) >= 4:
-        H, _ = cv2.findHomography(img_pts, real_pts)
+        H, _ = cv2.findHomography(real_pts, img_pts)
         print("Homography matrix:\n", H)
 
     
 
-    FOV_x_deg = 46.73  # FOV horizontal
+    FOV_x_deg = 51.282  # FOV horizontal
     FOV_x = np.deg2rad(FOV_x_deg)
     fx = (width / 2) / np.tan(FOV_x / 2)
 
-    # Calcula fy usando la relación de aspecto
-    aspect_ratio = width / height
-    fy = fx / aspect_ratio
+    FOV_y = 2 * np.arctan((height / width) * np.tan(FOV_x / 2))
+    fy = (height / 2) / np.tan(FOV_y / 2)
 
     cx = width / 2
     cy = height / 2
@@ -169,12 +168,12 @@ def inference(model_path, input_path):
                 [0, 0, 1]], dtype=np.float32)
     
 
-    H_NORM = H / np.linalg.norm(H[:,0])
+    H = H / np.linalg.norm(H[:,0])
     K_inv = np.linalg.inv(K)
 
-    h1 = H_NORM[:,0]
-    h2 = H_NORM[:,1]
-    h3 = H_NORM[:,2]
+    h1 = H[:,0]
+    h2 = H[:,1]
+    h3 = H[:,2]
 
     r1 = K_inv @ h1
     r2 = K_inv @ h2
@@ -216,5 +215,5 @@ def inference(model_path, input_path):
 if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
     model_path = os.path.join(base_dir, "models/unet_modelV2.pth")
-    input_path = os.path.join(base_dir, "data/dataset/test/render11frame0000.png")
+    input_path = os.path.join(base_dir, "data/dataset/test/render6frame0000.png")
     inference(model_path, input_path=input_path)
