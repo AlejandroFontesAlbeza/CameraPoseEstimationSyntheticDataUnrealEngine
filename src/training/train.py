@@ -19,11 +19,12 @@ parser.add_argument('--finetuning', action='store_true', help='Whether to perfor
 parser.add_argument('--last_model_path', type=str, default='models/unet_modelV2.pth', help='Path to the pre-trained model for fine-tuning')
 parser.add_argument('--new_model_path', type=str, default='models/unet_modelV3.pth', help='Path to save the fine-tuned/trained model')
 parser.add_argument('--step_lr', action='store_true', help='Whether to use StepLR')
+parser.add_argument('--step_size', type=int, default=20, help='Step size for StepLR')
 
 args = parser.parse_args()
 
 def main(train_img_path, valid_img_path, train_mask_path, valid_mask_path,
-        num_classes, lr, batch_size, num_epochs, finetuning=False, last_model_path=None, new_model_path=None, step_lr=True):
+        num_classes, lr, batch_size, num_epochs, finetuning=False, last_model_path=None, new_model_path=None, step_lr=True, step_size=20):
 
     print('Starting training with the following parameters:')
     print(f'  - Number of classes: {num_classes}')
@@ -32,6 +33,7 @@ def main(train_img_path, valid_img_path, train_mask_path, valid_mask_path,
     print(f'  - Number of epochs: {num_epochs}')
     print(f'  - Use StepLR: {step_lr}')
     print(f'  - Finetuning: {finetuning}')
+    print(f'  - Step size: {step_size}')
     if finetuning:
         print(f'  - Last model path: {last_model_path}')
         print(f'  - New model path: {new_model_path}')
@@ -67,7 +69,7 @@ def main(train_img_path, valid_img_path, train_mask_path, valid_mask_path,
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.8)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.8)
 
     for epoch in range(num_epochs):
         model.train()
@@ -124,4 +126,4 @@ if __name__ == "__main__":
     main(train_img_path, valid_img_path,
         train_mask_path, valid_mask_path,
         num_classes=args.num_classes, lr=args.lr, batch_size=args.batch_size, num_epochs=args.num_epochs,
-        finetuning=args.finetuning, last_model_path=args.last_model_path, new_model_path=args.new_model_path, step_lr=args.step_lr)
+        finetuning=args.finetuning, last_model_path=args.last_model_path, new_model_path=args.new_model_path, step_lr=args.step_lr,step_size=args.step_size)
