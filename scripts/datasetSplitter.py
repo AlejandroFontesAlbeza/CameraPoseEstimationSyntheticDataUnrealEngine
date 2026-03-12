@@ -60,14 +60,16 @@ def splitter(images_dir, masks_dir, train_images_dir, train_masks_dir, valid_ima
 
 if __name__ == "__main__":
 
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    images_dir = os.path.join(base_dir, "data/datasetPreProcessed/images")
-    masks_dir = os.path.join(base_dir, "data/datasetPreProcessed/masks")
+    images_dir = os.path.join(script_dir, "..","data","datasetPreProcessed","images")
+    masks_dir = os.path.join(script_dir, "..","data","datasetPreProcessed","masks")
 
-    train_images_dir = os.path.join(base_dir, "data/dataset/train/images")
-    train_masks_dir = os.path.join(base_dir, "data/dataset/train/masks")
-    valid_images_dir = os.path.join(base_dir, "data/dataset/valid/images")
-    valid_masks_dir = os.path.join(base_dir, "data/dataset/valid/masks")
+    train_images_dir = os.path.join(script_dir, "..","data","dataset","train","images")
+    train_masks_dir = os.path.join(script_dir, "..","data","dataset","train","masks")
+    valid_images_dir = os.path.join(script_dir, "..","data","dataset","valid","images")
+    valid_masks_dir = os.path.join(script_dir, "..","data","dataset","valid","masks")
 
-    splitter(images_dir, masks_dir, train_images_dir, train_masks_dir, valid_images_dir, valid_masks_dir)
+    splitter(images_dir, masks_dir,
+            train_images_dir, train_masks_dir,
+            valid_images_dir, valid_masks_dir)

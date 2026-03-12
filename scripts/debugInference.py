@@ -213,7 +213,7 @@ def inference(model_path, input_path):
 
 
 if __name__ == "__main__":
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-    model_path = os.path.join(base_dir, "models/unet_modelV2.pth")
-    input_path = os.path.join(base_dir, "data/dataset/test/render6frame0000.png")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(script_dir, "..", "models", "unet_modelV3.pth")
+    input_path = os.path.join(script_dir, "..", "data", "tennisMatch", "frames", "frame0249.png")
     inference(model_path, input_path=input_path)
