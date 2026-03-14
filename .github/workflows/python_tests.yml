@@ -20,4 +20,4 @@ jobs:
       - name: Install common OS dependencies
         run: pip install -e .
       - name: Run tests
-        run: pytest src/tests/
+        run: pytest tests/
