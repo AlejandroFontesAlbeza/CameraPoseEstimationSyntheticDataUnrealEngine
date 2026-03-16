@@ -1,4 +1,4 @@
-exactColorPalette = {
+exact_color_palette = {
     (0, 0, 0): 0,       # Background
     (255, 0, 0): 1,     # Class 1
     (0, 255, 0): 2,     # Class 2
@@ -8,13 +8,13 @@ exactColorPalette = {
     (0, 255, 255): 6,   # Class 6
 }
 
-rangeColorPalette = {
-    "class7": {"range": ((183,189), (0,0), (250,255)), "classIndex": 7}, # Class 7 needs to be range
-    "class8": {"range": ((200,255), (113,192), (0,0)), "classIndex": 8}, # Class 8 needs to be range
-    "class9": {"range": ((0,0), (221,255), (162,189)), "classIndex": 9} # Class 9 needs to be range
+range_color_palette = {
+    "class7": {"range": ((183,189), (0,0), (250,255)), "class_index": 7}, # Class 7 needs to be range
+    "class8": {"range": ((200,255), (113,192), (0,0)), "class_index": 8}, # Class 8 needs to be range
+    "class9": {"range": ((0,0), (221,255), (162,189)), "class_index": 9} # Class 9 needs to be range
 }
 
-inferenceColorPalette = {
+inference_color_palette = {
     0: (0, 0, 0),       # Background
     1: (255, 0, 0),     # Class 1
     2: (0, 255, 0),     # Class 2

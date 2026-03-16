@@ -1,4 +1,4 @@
-from utils.palette import inferenceColorPalette
+from utils.palette import inference_color_palette
 from unet.unet import Unet
 
 
@@ -37,7 +37,7 @@ def inference(model_path, input_path):
     width, height = img.size
     print(f"Input image size: {img.size}")
     input_tensor = transform(img).unsqueeze(0).to(device)
-    
+
     with torch.no_grad():
         for _ in range(2):
             _ = model(input_tensor)
@@ -103,12 +103,12 @@ def inference(model_path, input_path):
     }
 
 
-    for classIndex, color in inferenceColorPalette.items():
-        mask = (predicted_mask_resized == classIndex)
+    for class_index, color in inference_color_palette.items():
+        mask = (predicted_mask_resized == class_index)
         predicted_mask_color[mask] = color
 
-    for classIndex, color in inferenceColorPalette.items():
-        mask_binary = (predicted_mask_resized == classIndex).astype(np.uint8)
+    for class_index, color in inference_color_palette.items():
+        mask_binary = (predicted_mask_resized == class_index).astype(np.uint8)
 
         if np.count_nonzero(mask_binary) < 100:  # Evita clases pequeñas
             continue
@@ -120,10 +120,10 @@ def inference(model_path, input_path):
 
         [vx,vy,x,y] = cv2.fitLine(contour, cv2.DIST_L2,0,0.01,0.01)
         vx,vy,x,y = vx.item(), vy.item(), x.item(), y.item() # Convert to Python scalars
-        lines[classIndex] = (vx, vy, x, y)
+        lines[class_index] = (vx, vy, x, y)
 
-        cv2.line(img_np, (int(x - vx*1000), int(y - vy*1000)), (int(x + vx*1000), int(y + vy*1000)), color, 4)        
-    
+        cv2.line(img_np, (int(x - vx*1000), int(y - vy*1000)), (int(x + vx*1000), int(y + vy*1000)), color, 4)
+
     for index , (c1,c2) in intersections_lines.items():
         if c1 in lines and c2 in lines:
             vx1, vy1, x1, y1 = lines[c1]
@@ -133,7 +133,7 @@ def inference(model_path, input_path):
             t, s = np.linalg.solve(A, b)
 
             """ x_int = int(x1 + vx1 * t)
-            y_int = int(y1 + vy1 * t) 
+            y_int = int(y1 + vy1 * t)
             Or next: """
             x_int = int(x2 + vx2 * s)
             y_int = int(y2 + vy2 * s)
@@ -141,7 +141,7 @@ def inference(model_path, input_path):
 
             cv2.circle(img_np, (int(x_int), int(y_int)), 8, (255,255,255), -1)
             cv2.putText(img_np, f'{index}', (int(x_int)+10, int(y_int)-10), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,0), 2)
-    
+
 
     number_intersecctions = sorted(set(intersections.keys() & real_intersections.keys()))
 
@@ -152,7 +152,7 @@ def inference(model_path, input_path):
         H, _ = cv2.findHomography(real_pts, img_pts)
         print("Homography matrix:\n", H)
 
-    
+
 
     FOV_x_deg = 51.282  # FOV horizontal
     FOV_x = np.deg2rad(FOV_x_deg)
@@ -166,7 +166,7 @@ def inference(model_path, input_path):
     K = np.array([[fx, 0, cx],
                 [0, fy, cy],
                 [0, 0, 1]], dtype=np.float32)
-    
+
 
     H = H / np.linalg.norm(H[:,0])
     K_inv = np.linalg.inv(K)
