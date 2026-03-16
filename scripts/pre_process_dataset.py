@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
-from utils.preprocessing import dataProcess
+from utils.preprocessing import data_process
 
 def build_tasks(images_ue_folder, masks_ue_folder, images_out_folder, masks_out_folder):
     """
@@ -33,7 +33,7 @@ def process_folders(images_ue_folder, masks_ue_folder, images_out_folder, masks_
     with ProcessPoolExecutor(max_workers=num_workers) as executor:
         list(
             tqdm(
-                executor.map(dataProcess, *zip(*tasks)),
+                executor.map(data_process, *zip(*tasks)),
                 total=len(tasks),
                 desc="Processing images and masks"
             )
