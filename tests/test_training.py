@@ -5,6 +5,7 @@ from training.metrics import calculate_IoU
 from unet.unet import Unet
 from unet.custom_dataset import CustomDataset
 from training.metrics import epoch_trained
+import config
 
 
 def test_calculate_iou_simple_case():
@@ -20,9 +21,8 @@ def test_unet_forward():
 	assert y.shape == (1, 10, 512, 512)
 
 def test_mask_class_range():
-	script_dir = os.path.dirname(os.path.abspath(__file__))
-	img_dir = os.path.join(script_dir, "..", "data", "test_dataset", "train", "images")
-	mask_dir = os.path.join(script_dir, "..", "data", "test_dataset", "train", "masks")
+	img_dir = config.TEST_DATASET_IMAGES_TRAIN_DIR
+	mask_dir = config.TEST_DATASET_MASKS_TRAIN_DIR
 	num_classes = 10
 	dataset = CustomDataset(img_dir, mask_dir)
 	mask = dataset[0][1]
