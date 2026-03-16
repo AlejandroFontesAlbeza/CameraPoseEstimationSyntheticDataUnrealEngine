@@ -1,10 +1,12 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 import os
+import sys
 from training.metrics import calculate_IoU
 from unet.unet import Unet
 from unet.custom_dataset import CustomDataset
 from training.metrics import epoch_trained
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 
 
