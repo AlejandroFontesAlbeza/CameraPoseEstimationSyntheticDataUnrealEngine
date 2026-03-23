@@ -1,2 +1,2 @@
 @echo off
-python -m scripts.run_video_inference %*
+python -m scripts.video_inference %*

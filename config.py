@@ -42,4 +42,4 @@ TEST_DATASET_MASKS_VALID_DIR = DATA_DIR / "test_dataset" / "valid" / "masks"
 
 ### INFERENCE PATHS
 INFERENCE_VIDEO_PATH = DATA_DIR / "tennisMatch" / "clips" / "clip1.mp4"
-INFERENCE_MODEL_PATH = MODELS_DIR / "unet_modelV0.pth"
+INFERENCE_MODEL_PATH = MODELS_DIR / "unet_modelNew.pth"

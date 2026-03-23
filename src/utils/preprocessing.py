@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np
 import os
 
-from src.utils.palette import exact_color_palette, range_color_palette
+from utils.dict_utils import exact_color_palette, range_color_palette
 
 
 
