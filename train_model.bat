@@ -1,2 +1,2 @@
 @echo off
-python -m scripts.train_model %*
+python -m src.training.main %*

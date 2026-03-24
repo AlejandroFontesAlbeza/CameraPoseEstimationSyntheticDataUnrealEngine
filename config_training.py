@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent
 
 
-
+### TRAINING PATHS
 # Define dataset paths
 DATA_DIR = ROOT_DIR / "data"
 
@@ -23,7 +23,7 @@ DATASET_IMAGES_VALID_DIR = DATA_DIR / "dataset" / "valid" / "images"
 DATASET_MASKS_VALID_DIR = DATA_DIR / "dataset" / "valid" / "masks"
 
 
-#Define model paths
+#Define model paths finetuning and saving new model
 MODELS_DIR = ROOT_DIR / "models"
 MODEL_PATH = MODELS_DIR / "unet_modelV0.pth"
 NEW_MODEL_PATH = MODELS_DIR / "unet_modelNew.pth"
