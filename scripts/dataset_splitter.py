@@ -5,7 +5,7 @@ from collections import defaultdict
 from tqdm import tqdm
 
 from utils.preprocessing import verify_split
-import config
+import config_training
 
 def splitter(images_dir, masks_dir, train_images_dir, train_masks_dir, valid_images_dir, valid_masks_dir, verification=True, split_ratio=0.7):
 
@@ -60,6 +60,6 @@ def splitter(images_dir, masks_dir, train_images_dir, train_masks_dir, valid_ima
 
 if __name__ == "__main__":
 
-    splitter(config.PREPROCESSED_IMAGES_DIR, config.PREPROCESSED_MASKS_DIR,
-            config.DATASET_IMAGES_TRAIN_DIR, config.DATASET_MASKS_TRAIN_DIR,
-            config.DATASET_IMAGES_VALID_DIR, config.DATASET_MASKS_VALID_DIR)
+    splitter(config_training.PREPROCESSED_IMAGES_DIR, config_training.PREPROCESSED_MASKS_DIR,
+            config_training.DATASET_IMAGES_TRAIN_DIR, config_training.DATASET_MASKS_TRAIN_DIR,
+            config_training.DATASET_IMAGES_VALID_DIR, config_training.DATASET_MASKS_VALID_DIR)

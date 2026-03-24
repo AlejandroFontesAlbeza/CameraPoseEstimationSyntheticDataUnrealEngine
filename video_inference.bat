@@ -1,2 +1,2 @@
 @echo off
-python -m scripts.video_inference %*
+python -m src.inference.main %*

@@ -1,11 +1,40 @@
+import torch
+
 from training.metrics import epoch_trained
 from training.utils import device_selection, get_img_transform, get_data_loaders, get_model, optimizations
+import argparse
+import config_training
 
 
+def main():
 
-def train(train_img_path, valid_img_path, train_mask_path, valid_mask_path,
-        num_classes, lr, batch_size, num_epochs, finetuning=False, model_path=None,
-        new_model_path=None, step_lr=True, step_size=20):
+    parser = argparse.ArgumentParser(description='Train a UNet model for image segmentation')
+
+    parser.add_argument('--num_classes', type=int, default=10, help='Number of classes for segmentation')
+    parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
+    parser.add_argument('--batch_size', type=int, default=2, help='Batch size for training')
+    parser.add_argument('--num_epochs', type=int, default=100, help='Number of epochs for training')
+    parser.add_argument('--finetuning', action='store_true', help='Whether to perform fine-tuning')
+    parser.add_argument('--step_lr', action='store_true', help='Whether to use StepLR')
+    parser.add_argument('--step_size', type=int, default=20, help='Step size for StepLR')
+
+    args = parser.parse_args()
+
+    train_img_path = config_training.DATASET_IMAGES_TRAIN_DIR
+    train_mask_path = config_training.DATASET_MASKS_TRAIN_DIR
+    valid_img_path = config_training.DATASET_IMAGES_VALID_DIR
+    valid_mask_path = config_training.DATASET_MASKS_VALID_DIR
+    model_path = config_training.MODEL_PATH
+    new_model_path = config_training.NEW_MODEL_PATH
+
+    num_classes = args.num_classes
+    lr = args.lr
+    batch_size = args.batch_size
+    num_epochs = args.num_epochs
+    finetuning = args.finetuning
+    step_lr = args.step_lr
+    step_size = args.step_size
+
 
     print('Training parameters:')
     print(f'num_classes: {num_classes}')
@@ -48,7 +77,11 @@ def train(train_img_path, valid_img_path, train_mask_path, valid_mask_path,
         print(f'mIoU: {miou * 100:.2f}%')
 
     print('model saved')
-    return model, new_model_path
+    torch.save(model.state_dict(), new_model_path)
+
+
+if __name__ == "__main__":
+    main()
 
 
 
