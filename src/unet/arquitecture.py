@@ -12,7 +12,7 @@ class DoubleConv(nn.Module):
         )
     def forward(self, x):
         return self.double_conv(x)
-    
+
 
 class Down(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -24,7 +24,7 @@ class Down(nn.Module):
 
     def forward(self, x):
         return self.down(x)
-    
+
 
 class Up(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -36,7 +36,7 @@ class Up(nn.Module):
         x1 = self.up(x1)
         x = torch.cat([x2, x1], dim=1)
         return self.double_conv(x)
-    
+
 
 class OutConv(nn.Module):
     def __init__(self, in_channels, out_channels):

@@ -1,7 +1,6 @@
 data/*
 !data/test_rsc/
 models/
-rsc/
 venv/
 __pycache__/
 .pytest_cache/

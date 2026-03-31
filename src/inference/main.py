@@ -1,5 +1,3 @@
-from email import message
-
 import cv2
 import numpy as np
 import argparse
@@ -13,6 +11,7 @@ from inference.camera_pose import homography, camera_pose_estimation
 
 
 def main():
+
     parser = argparse.ArgumentParser(description='Inference parameters')
     parser.add_argument('--save_data', action='store_true', help='Save frame info')
     parser.add_argument('--save_video', action='store_true', help='Save output video as GIF')

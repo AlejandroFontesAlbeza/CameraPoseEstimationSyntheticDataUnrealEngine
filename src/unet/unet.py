@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from unet.arquitecture import DoubleConv, Down, Up, OutConv
 

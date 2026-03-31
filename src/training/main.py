@@ -7,7 +7,6 @@ import config_training
 
 
 def main():
-
     parser = argparse.ArgumentParser(description='Train a UNet model for image segmentation')
 
     parser.add_argument('--num_classes', type=int, default=10, help='Number of classes for segmentation')

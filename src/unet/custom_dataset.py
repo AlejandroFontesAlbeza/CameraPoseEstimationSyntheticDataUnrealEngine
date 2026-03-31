@@ -17,7 +17,7 @@ class CustomDataset(Dataset):
 
     def __len__(self):
         return len(self.img_files)
-    
+
     def __getitem__(self, idx):
         img_path = os.path.join(self.img_dir, self.img_files[idx])
         mask_path = os.path.join(self.mask_dir, self.masks_files[idx])
