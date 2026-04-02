@@ -168,6 +168,6 @@ This project demonstrates how a combination of synthetic data and computer visio
 While the implementation focuses on tennis, the same approach can be applied to other sports and scenarios where scene geometry is known.
 
 <p align="center">
-    <img src="rsc/football.gif" width="50%" />
-    <img src="rsc/football.gif" width="50%" />
+    <img src="rsc/football.gif" width="45%" />
+    <img src="rsc/football.gif" width="45%" />
 </p>
