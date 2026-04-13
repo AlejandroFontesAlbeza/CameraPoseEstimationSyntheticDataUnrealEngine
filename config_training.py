@@ -25,7 +25,7 @@ DATASET_MASKS_VALID_DIR = DATA_DIR / "dataset" / "valid" / "masks"
 
 #Define model paths finetuning and saving new model
 MODELS_DIR = ROOT_DIR / "models"
-MODEL_PATH = MODELS_DIR / "unet_modelV0.pth"
+MODEL_PATH = MODELS_DIR / "unet_modelV1.pth"
 NEW_MODEL_PATH = MODELS_DIR / "unet_modelNew.pth"
 
 
