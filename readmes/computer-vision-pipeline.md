@@ -70,14 +70,83 @@ These intersection points will be used in subsequent stages of the pipeline for 
 The segmentation model used in this project is based on **U-Net**, a widely adopted architecture for semantic segmentation tasks.
 
 <p align="center">
-  <img src="../rsc/u-net-architecture.png" width="60%" />
+  <img src="../rsc/u-net-architecture.png" width="45%" />
+  <img src="../rsc/road-Unet.jpg" width="45%" />
 </p>
 
 
-U-Net was selected due to its ability to produce precise, pixel-level predictions while preserving spatial information. Its **encoder–decoder structure** allows the model to capture both high-level contextual features and fine-grained details, which is particularly important for accurately segmenting thin structures such as tennis court lines.
+**U-Net** was selected due to its ability to produce precise, pixel-level predictions while preserving spatial information. Its **encoder–decoder structure** allows the model to capture both high-level contextual features and fine-grained details, which is particularly important for accurately segmenting thin structures such as tennis court lines.
 
 This makes it well-suited for the problem at hand, where the objective is not only to classify regions but to recover the exact geometry of line-based structures that will later be used for geometric reasoning.
 
 Another advantage of U-Net is its robustness when working with relatively small datasets, which aligns with the iterative training strategy followed in this project.
 
 *Note: This README focuses on the application of the model within the pipeline. A more detailed explanation of the U-Net architecture can be found in the following repository 👉 [Repo](https://github.com/AlejandroFontesAlbeza/U-Net-Image-Segmentation)
+
+---
+
+## Training Strategy and Iterative Improvement
+
+The training process followed an iterative approach, starting from a minimal dataset to validate the full pipeline and progressively increasing complexity based on observed model behavior.
+
+Rather than aiming for maximum performance from the beginning, the focus was on building a reliable workflow that allowed rapid experimentation, error analysis, and controlled improvements.
+
+### 5.1 Initial Training (Version 0)
+
+The first version of the model was trained using a small synthetic dataset:
+
+- **5** Level Sequences
+- **100** frames per sequence
+- Total: **500** images + **500** masks
+
+All sequences were generated using similar camera configurations, with slight variations in position and field of view to approximate a broadcast perspective.
+
+The goal of this stage was not to achieve high accuracy, but to verify that the entire pipeline—from data generation to inference—was functioning correctly.
+
+Training setup:
+
+- **Epochs**: 50
+- **Batch size**: 2
+- **Hardware**: NVIDIA GTX 1650 Ti 4Gb VRAM
+- **Training time**: ~10 hours
+
+Result:
+
+- **mIoU**: ~74%
+
+Despite the limited dataset, the model was able to learn the basic structure of the court, confirming that the synthetic data pipeline was valid.
+
+<p align="center">
+  <img src="../rsc/Input_Mask_V0_19.png" width="70%" />
+</p>
+
+
+### 5.2 Error Analysis and Dataset Expansion + Fine-Tuning (Version 1)
+
+To guide further improvements, a set of inference tests was performed on unseen frames. Approximately 10 samples were analyzed to identify consistent failure patterns.
+
+Common issues included:
+
+- Inaccurate segmentation of thin lines
+- Errors in complex intersections
+- Sensitivity to slight variations in camera perspective
+
+Based on these observations, the dataset was expanded with a targeted strategy:
+
+- Increased sequence length from 100 to 200 frames
+- Maintained similar scene configuration
+- Introduced additional variability through:
+- Camera position
+- Camera rotation
+- Field of view
+
+This step ensured that new data directly addressed the model’s weaknesses without introducing unnecessary complexity. At the next table you can visualize 5 different frames to see +- the current errors:
+
+
+| Frame 19 | Frame 50 | Frame 30 |
+|----------|----------|----------|
+| <img src="../rsc/Input_Mask_V0_19.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_19.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_19.png" width ="2000">|
+
+Frame 209 | Frame 259 |
+----------|----------|
+| <img src="../rsc/Input_Mask_V0_19.png"> | <img src="../rsc/Input_Mask_V0_19.png"> |
