@@ -140,16 +140,20 @@ Based on these observations, the dataset was expanded with a targeted strategy:
 - Camera rotation
 - Field of view
 
-This step ensured that new data directly addressed the model’s weaknesses without introducing unnecessary complexity. At the next table you can visualize 5 different frames to see +- the current errors:
+This step ensured that new data directly addressed the model’s weaknesses without introducing unnecessary complexity. At the next table you can visualize 6 different frames to see +- the current errors:
 
 
-| Frame 19 | Frame 50 | Frame 30 |
-|----------|----------|----------|
-| <img src="../rsc/Input_Mask_V0_19.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_50.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_30.png" width ="2000">|
+| Frame 19 | Frame 50 |
+|----------|----------|
+| <img src="../rsc/Input_Mask_V0_19.png" width ="4000"> | <img src="../rsc/Input_Mask_V0_50.png" width ="4000"> |
+
+| Frame 30 | Frame 224 |
+|----------|----------|
+| <img src="../rsc/Input_Mask_V0_30.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_224.png" width ="2000"> |
 
 Frame 209 | Frame 259 |
 ----------|----------|
-| <img src="../rsc/Input_Mask_V0_209.png"> | <img src="../rsc/Input_Mask_V0_259.png"> |
+| <img src="../rsc/Input_Mask_V0_209.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_259.png" width ="2000"> |
 
 
 After the analysis, the model was fine-tuned using the expanded dataset, keeping the same architecture but adjusting training parameters.
