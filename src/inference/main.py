@@ -17,7 +17,9 @@ def main():
     parser.add_argument('--save_video', action='store_true', help='Save output video as GIF')
     parser.add_argument('--show_mask', action='store_true', help='Show predicted mask')
     parser.add_argument('--show_stats', action='store_true', help='Show inference stats on display')
-    parser.add_argument('--unique_color', action='store_false', help='Use a unique color for all lines')
+    parser.add_argument('--unique_color', action='store_true', help='Use a unique color for all lines')
+    parser.add_argument('--show_lines', action='store_true', help='Use a unique color for all lines')
+
 
     args = parser.parse_args()
 
@@ -26,11 +28,13 @@ def main():
     show_mask = args.show_mask
     show_stats = args.show_stats
     unique_color = args.unique_color
+    show_lines = args.show_lines
     print(f"save_data: {save_data}")
     print(f"save_video: {save_video}")
     print(f"show_mask: {show_mask}")
     print(f"show_stats: {show_stats}")
     print(f"unique_color: {unique_color}")
+    print(f"show_lines: {show_lines}")
 
     device = get_device()
     print(f"Using device: {device}")
@@ -54,7 +58,7 @@ def main():
     for frame, predicted_mask_resized, predicted_mask_color, inference_time, fps in video_inference:
         frame_with_lines, img_intersections = draw_lines_and_intersections(
             frame.copy(), predicted_mask_resized, inference_color_palette, intersections_lines,
-            unique_color=unique_color
+            unique_color=unique_color, show_lines=show_lines
         )
 
         H = homography(img_intersections, real_world_points)
@@ -63,7 +67,7 @@ def main():
             cam_position, cam_rotation, f, FOV_x_deg = camera_pose_estimation(H, cx, cy, f_prev)
             f_prev = f
         else:
-            print("Skipping Pose estimation due to insufficient intersections.")
+            #print("Skipping Pose estimation due to insufficient intersections.")
             cam_position, cam_rotation, f, FOV_x_deg = [0,0,0], [0,0,0], 0, 0
 
         frame_with_mask = np.vstack((frame_with_lines, predicted_mask_color))
@@ -81,14 +85,14 @@ def main():
         if show_stats:
             draw_stats(display_resized, inference_time, fps, cam_position, cam_rotation, FOV_x_deg)
 
-        message = {
-            "frame": int(frame_number),
-            "camera_position": cam_position.tolist(),
-            "camera_rotation": cam_rotation.tolist(),
-            "FOV": float(FOV_x_deg),
-            "timestamp": float(time.time())
-        }
-        send_udp_message(config_inference.IP, config_inference.PORT, message)
+        # message = {
+        #     "frame": int(frame_number),
+        #     "camera_position": cam_position.tolist(),
+        #     "camera_rotation": cam_rotation.tolist(),
+        #     "FOV": float(FOV_x_deg),
+        #     "timestamp": float(time.time())
+        # }
+        # send_udp_message(config_inference.IP, config_inference.PORT, message)
 
         frames_list.append(display_resized)
         cv2.imshow('Inference', display_resized)

@@ -12,7 +12,7 @@ import torch
 from unet.unet import Unet
 from torchvision import transforms
 
-def draw_lines_and_intersections(img_np, predicted_mask_resized, inference_color_palette, intersections_lines, min_pixels=200, unique_color=True):
+def draw_lines_and_intersections(img_np, predicted_mask_resized, inference_color_palette, intersections_lines, min_pixels=200, unique_color=True, show_lines = True):
     lines = {}
     intersections = {}
     lines_distance = 2000
@@ -23,36 +23,37 @@ def draw_lines_and_intersections(img_np, predicted_mask_resized, inference_color
 
     fixed_color = (0, 255, 0)
 
-    # Dibuja líneas ajustadas a los contornos de cada clase
-    for class_index, color in inference_color_palette.items():
-        if class_index == 0:
-            continue
-        mask_binary = (predicted_mask_resized == class_index).astype(np.uint8)
-        if np.count_nonzero(mask_binary) < min_pixels:
-            continue
-        contours, _ = cv2.findContours(mask_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 0:
-            continue
-        contour = max(contours, key=cv2.contourArea)
-        [vx, vy, x, y] = cv2.fitLine(contour, cv2.DIST_L2, 0, 0.01, 0.01)
-        vx, vy, x, y = vx.item(), vy.item(), x.item(), y.item()
-        lines[class_index] = (vx, vy, x, y)
-        use_this_color = fixed_color if unique_color else to_bgr(color)
-        cv2.line(img_np, (int(x - vx * lines_distance), int(y - vy * lines_distance)), (int(x + vx * lines_distance), int(y + vy * lines_distance)), use_this_color, 3)
+    if show_lines:
+        # Dibuja líneas ajustadas a los contornos de cada clase
+        for class_index, color in inference_color_palette.items():
+            if class_index == 0:
+                continue
+            mask_binary = (predicted_mask_resized == class_index).astype(np.uint8)
+            if np.count_nonzero(mask_binary) < min_pixels:
+                continue
+            contours, _ = cv2.findContours(mask_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            if len(contours) == 0:
+                continue
+            contour = max(contours, key=cv2.contourArea)
+            [vx, vy, x, y] = cv2.fitLine(contour, cv2.DIST_L2, 0, 0.01, 0.01)
+            vx, vy, x, y = vx.item(), vy.item(), x.item(), y.item()
+            lines[class_index] = (vx, vy, x, y)
+            use_this_color = fixed_color if unique_color else to_bgr(color)
+            cv2.line(img_np, (int(x - vx * lines_distance), int(y - vy * lines_distance)), (int(x + vx * lines_distance), int(y + vy * lines_distance)), use_this_color, 3)
 
-    # Dibuja intersecciones
-    for index, (c1, c2) in intersections_lines.items():
-        if c1 in lines and c2 in lines:
-            vx1, vy1, x1, y1 = lines[c1]
-            vx2, vy2, x2, y2 = lines[c2]
-            A = np.array([[vx1, -vx2], [vy1, -vy2]])
-            b = np.array([x2 - x1, y2 - y1])
-            t, s = np.linalg.solve(A, b)
-            x_int = int(x2 + vx2 * s)
-            y_int = int(y2 + vy2 * s)
-            intersections[index] = (x_int, y_int)
-            cv2.circle(img_np, (x_int, y_int), 8, (255, 255, 255), -1)
-            cv2.putText(img_np, f'{index}', (x_int + 10, y_int - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)
+        # Dibuja intersecciones
+        for index, (c1, c2) in intersections_lines.items():
+            if c1 in lines and c2 in lines:
+                vx1, vy1, x1, y1 = lines[c1]
+                vx2, vy2, x2, y2 = lines[c2]
+                A = np.array([[vx1, -vx2], [vy1, -vy2]])
+                b = np.array([x2 - x1, y2 - y1])
+                t, s = np.linalg.solve(A, b)
+                x_int = int(x2 + vx2 * s)
+                y_int = int(y2 + vy2 * s)
+                intersections[index] = (x_int, y_int)
+                cv2.circle(img_np, (x_int, y_int), 8, (255, 255, 255), -1)
+                cv2.putText(img_np, f'{index}', (x_int + 10, y_int - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)
 
     return img_np, intersections
 

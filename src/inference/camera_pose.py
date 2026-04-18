@@ -14,7 +14,7 @@ def homography(img_intersections, real_world_points):
         H, _ = cv2.findHomography(real_pts, img_pts)
         return H
     else:
-        print("Not enough intersections for homography estimation.")
+        #print("Not enough intersections for homography estimation.")
         return None
 
 def camera_pose_estimation(H, cx, cy, f_prev = None):

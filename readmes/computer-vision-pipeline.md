@@ -91,7 +91,7 @@ The training process followed an iterative approach, starting from a minimal dat
 
 Rather than aiming for maximum performance from the beginning, the focus was on building a reliable workflow that allowed rapid experimentation, error analysis, and controlled improvements.
 
-### 5.1 Initial Training (Version 0)
+### Initial Training (Version 0)
 
 The first version of the model was trained using a small synthetic dataset:
 
@@ -121,7 +121,7 @@ Despite the limited dataset, the model was able to learn the basic structure of 
 </p>
 
 
-### 5.2 Error Analysis and Dataset Expansion + Fine-Tuning (Version 1)
+### Error Analysis and Dataset Expansion + Fine-Tuning (Version 1)
 
 To guide further improvements, a set of inference tests was performed on unseen frames. Approximately 10 samples were analyzed to identify consistent failure patterns.
 
@@ -145,8 +145,85 @@ This step ensured that new data directly addressed the model’s weaknesses with
 
 | Frame 19 | Frame 50 | Frame 30 |
 |----------|----------|----------|
-| <img src="../rsc/Input_Mask_V0_19.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_19.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_19.png" width ="2000">|
+| <img src="../rsc/Input_Mask_V0_19.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_50.png" width ="2000"> | <img src="../rsc/Input_Mask_V0_30.png" width ="2000">|
 
 Frame 209 | Frame 259 |
 ----------|----------|
-| <img src="../rsc/Input_Mask_V0_19.png"> | <img src="../rsc/Input_Mask_V0_19.png"> |
+| <img src="../rsc/Input_Mask_V0_209.png"> | <img src="../rsc/Input_Mask_V0_259.png"> |
+
+
+After the analysis, the model was fine-tuned using the expanded dataset, keeping the same architecture but adjusting training parameters.
+
+Key decisions:
+
+- No layers were frozen
+- The entire network was allowed to adapt to the new data
+- A lower learning rate was used to stabilize training and refine learned features
+
+Training setup:
+
+- Epochs: 20
+- Reduced learning rate
+- Training time: ~5 hours
+
+Result:
+
+- mIoU: ~80%
+
+This stage showed a clear improvement in both segmentation quality and structural consistency.
+
+
+### Final Dataset & Model Refinement + Fine-Tuning (Version 2)
+
+To further improve performance, a final dataset expansion was performed with a stronger focus on structural variability.
+
+Instead of only modifying camera parameters, additional scene elements were adjusted:
+
+- Court line positioning
+- Net alignment
+- Umpire chair and secondary elements
+
+This introduced subtle geometric variations while maintaining consistency with the reference scenario.
+
+The final dataset consisted of:
+
+- Additional 5 sequences
+- 500 frames per sequence
+- Total dataset size: ~4000 images + masks
+
+For the final fine-tuning the training setup was:
+
+- Epochs : 30
+- Further reduced lr
+- Training time: ~10 hours (Larger Dataset and + 10 epochs with the first fine-tuning)
+- mIoU = 84%
+
+*The model demonstrated improved robustness, particulary in line continuity, interssections occlusion and stability under viewpoint variations*
+
+<p align="center">
+  <img src="../rsc/inference_output2.gif" width="40%" />
+</p>
+
+
+### Key Observations
+- Starting with a small dataset enabled rapid validation of the full pipeline
+- Iterative dataset refinement was more effective than generating large amounts of data upfront
+- Allowing the full model to adapt (no layer freezing) improved overall performance
+- Controlled variability was essential for improving generalization
+
+
+---
+
+## Inference Pipeline
+
+The objective of the inference pipeline is to transform the segmentation output of the model into meaningful geometric information that can be used for camera understanding.
+
+Rather than stopping at pixel-wise predictions, the system extracts structural features from the segmentation mask and uses them to estimate the relationship between the image and the real-world court.
+
+This is achieved through a multi-step process:
+
+Line extraction from segmentation masks
+Intersection detection
+Homography estimation
+
+
