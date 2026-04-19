@@ -218,16 +218,91 @@ For the final fine-tuning the training setup was:
 
 ---
 
-## Inference Pipeline
+## Inference, Geometric Reconstruction and Camera Pose Estimation
 
-The objective of the inference pipeline is to transform the segmentation output of the model into meaningful geometric information that can be used for camera understanding.
+The objective of the inference stage is to transform the segmentation output of the model into meaningful geometric information, ultimately enabling camera pose estimation.
 
-Rather than stopping at pixel-wise predictions, the system extracts structural features from the segmentation mask and uses them to estimate the relationship between the image and the real-world court.
+Rather than treating segmentation as the final output, this pipeline leverages the structural information of the court to reconstruct its geometry and estimate the relationship between the image and the real-world scene.
 
-This is achieved through a multi-step process:
+The process is composed of the following steps:
 
-Line extraction from segmentation masks
-Intersection detection
-Homography estimation
+- Extraction of court lines from segmentation masks
+- Detection of line **intersections**
+- Estimation of the **Homography**
+- **Recovery** of camera parameters from the geometric transformation
 
+
+### Line Extraction from Segmentation
+
+The predicted segmentation mask is first converted into a set of geometric line representations.
+
+For each class corresponding to a court line:
+
+- A binary mask is extracted
+- Contours are computed using [cv2.findCountours](https://docs.opencv.org/4.x/d4/d73/tutorial_py_contours_begin.html)
+- The largest contour is selected
+- A line is fitted using [cv2.fitLine](https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html#gaf849da1fdafa67ee84b1e9a23b93f91f)
+
+To improve robustness:
+
+- Small regions are filtered out using a minimum **pixel threshold**
+- Only **dominant contours** are considered
+- Lines are extended across the image
+
+This step transforms noisy pixel predictions into stable geometric primitives.
+
+<p align="center">
+  <img src="../rsc/Line_extraction.png" />
+</p>
+
+
+### Intersection Detection
+
+Once the lines are extracted, their intersections are computed.
+
+The relevant intersections are predefined based on the known structure of the tennis court. Each intersection corresponds to a pair of lines defined in a mapping structure.
+
+For each valid pair:
+
+- Lines are expressed in parametric form
+- A linear system is solved using numpy.linalg.solve
+- The intersection point is computed and stored
+
+This produces a set of 2D image points corresponding to key court locations.
+
+
+<p align="center">
+    <img src="../rsc/Intersecctions_Points.png" width="40%" style="position: relative; top: -200px; left: -60px" />
+    <img src="../rsc/TennisCourtBird.png" width="30%" />
+</p>
+
+
+### Homography Estimation + Perspective Transformation
+
+With the detected intersection points, the geometric relationship between the image plane and the tennis court is modeled using a [Homography](https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html)
+
+A homography defines a projective transformation between two planar coordinate systems and is estimated using point correspondences between:
+
+- Image-space coordinates (detected intersections)
+- World-space coordinates (predefined court geometry)
+
+At least four non-collinear correspondences are required to solve for the 3×3 transformation matrix, as defined by the degrees of freedom of a projective mapping. The estimation is performed using OpenCV (```cv2.findHomography```).
+
+Given the planar assumption of the tennis court (Z = 0), the homography provides a valid approximation of the transformation between the physical court surface and the image plane.
+
+Once the homography matrix is computed, it is used to project the image into a top-down coordinate system using a perspective transformation (```cv2.warpPerspective```).
+
+This operation applies the estimated projective mapping to each pixel, effectively reconstructing a bird’s-eye view of the court. The resulting transformation enables:
+
+- Validation of geometric consistency
+- Visualization of the court in metric space
+- Direct spatial interpretation of detected features
+
+The warped output provides a 2D representation where the court geometry is approximately rectified, allowing direct comparison between predicted intersections and their expected real-world positions.
+
+<p align="center">
+  <img src="../rsc/Warp_Perspective.png" width = "70%"/>
+</p>
+
+### Camera Pose Estimation from Homography
 
