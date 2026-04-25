@@ -18,7 +18,6 @@ def main():
     parser.add_argument('--show_mask', action='store_true', help='Show predicted mask')
     parser.add_argument('--show_stats', action='store_true', help='Show inference stats on display')
     parser.add_argument('--unique_color', action='store_true', help='Use a unique color for all lines')
-    parser.add_argument('--show_lines', action='store_true', help='Use a unique color for all lines')
 
 
     args = parser.parse_args()
@@ -28,13 +27,11 @@ def main():
     show_mask = args.show_mask
     show_stats = args.show_stats
     unique_color = args.unique_color
-    show_lines = args.show_lines
     print(f"save_data: {save_data}")
     print(f"save_video: {save_video}")
     print(f"show_mask: {show_mask}")
     print(f"show_stats: {show_stats}")
     print(f"unique_color: {unique_color}")
-    print(f"show_lines: {show_lines}")
 
     device = get_device()
     print(f"Using device: {device}")
@@ -58,7 +55,7 @@ def main():
     for frame, predicted_mask_resized, predicted_mask_color, inference_time, fps in video_inference:
         frame_with_lines, img_intersections = draw_lines_and_intersections(
             frame.copy(), predicted_mask_resized, inference_color_palette, intersections_lines,
-            unique_color=unique_color, show_lines=show_lines
+            unique_color=unique_color
         )
 
         H = homography(img_intersections, real_world_points)

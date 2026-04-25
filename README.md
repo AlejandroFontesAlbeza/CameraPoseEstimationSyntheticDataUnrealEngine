@@ -2,9 +2,7 @@
 End-to-end pipeline demonstrating how synthetic data generated in Unreal Engine can be used to train Neural Networks arquitectures to solve a real problem. For this project we applied this workflow for a tennis match segmenting the court lines for homography estimation, and camera pose reconstruction for AR and broadcast applications.
 
 <p align="center">
-  <img src="rsc/inference_output.gif" width="45%" />
-  <img src="rsc/inference_output.gif" width="45%" />
-  <img src="rsc/inference_output.gif" width="45%" />
+  <img src="rsc/inference_outputV2.gif" width="80%" />
 </p>
 
 ---
