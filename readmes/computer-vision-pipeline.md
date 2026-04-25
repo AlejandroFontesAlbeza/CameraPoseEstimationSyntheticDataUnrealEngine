@@ -306,3 +306,103 @@ The warped output provides a 2D representation where the court geometry is appro
 
 ### Camera Pose Estimation from Homography
 
+Given a computed Homography matrix H, the goal os this stage is to recover the intrinsic and extrinsic parameters of the camera under the planar scene assumption (Z=0).
+We can express the homography that relates a world plane to the 2D image as:
+
+$$
+H = K [r_1 \; r_2 \; t]
+$$
+
+where:
+- K is the intrinsic camera matrix
+- r1,r2 are the first two columns of the rotation matrix
+- t is the translation vector
+
+*This formulation implies that the system has 8 degrees of freedom, which requires at least 4 points correspondences to be fully constrained.*
+
+To calculate the **instrinsic parameter estimation**, we are going to define the instrinsic Matrix as K, parameterized as:
+
+$$
+K=
+\begin{bmatrix}
+f & 0 & c_x \\
+0 & f & c_y \\
+0 & 0 & 1
+\end{bmatrix}
+$$
+
+We are going to assume the principal point (cx,cy) to lie at the center of the image, and the focal length *f* is unknown.
+
+Instead of assuming a fixed focal length, because at broadceast scenarios the camera lens have dinamic FOVº, is going to be estimated by minimizing a geometric consistency error derived from the *H* decomposition:
+
+- Orthogonality constraint between r1 and r2:
+$$
+r_1 \cdot r_2 \approx 0
+$$
+
+- Consistency of their magnitudes:
+$$
+\| r_1\| \approx \|r_2\|
+$$
+
+Finally the optimal focal length is obtained by minimizing a weighted error function:
+
+$$
+E(f) = (r_1 \cdot r_2)^2 + λ(\|r_1\| - \|r_2\|)^2
+$$
+
+This type of optimization is solved using a bounded scalar minimization strategy, ensuring physically plausible values and avoiding degenerate solutions. Solved with the [scipy](https://scipy.org/es/) function ```minimize_scalar```.
+
+Once the *f* ideal is estimated, the instrinsic matrix **K** is used to isolate the extrinsic components:
+
+$$
+K^{-1} H = [r_1r_2t]
+$$
+
+Since this decomposition is defined up to scale, a normalization factor *L* is applied:
+
+$$
+L = \frac{1}{\|r_1\|}
+$$
+
+ensuring that the recovered rotation vectors satisfy unit norm constraints.
+
+
+After that we can recover the third rotation axis as:
+$$
+r_3 = r_1r_2
+$$
+
+forming an initial rotation matrix:
+
+$$
+R = [r_1r_2r_3]
+$$
+
+An extra that can guarentee a physical valid rotation matrix satisfying orthogonality constraints and enforce validity in the special orthohonal group SO(3), the matrix is refined using Singular Value Decomposition:
+
+$$
+R = U\Sigma V^T -> R = UV^T
+$$
+
+To distinguishe the translation between the camera space and the world reference frame we need to calculate the camera position in world coordinates that is derived from the extrinsic relationship:
+
+$$
+C = -R^Tt
+$$
+
+Finally, to get all the camera data necessary por the pose estimation is to calculate the FOV, in this case I used de Horizontal FOV because is the same as in Unreal Engine camera properties:
+
+
+$$
+FOV_H = 2arctan(\frac{c_x}{f})
+$$
+
+This allows dynamic adaptation of the camera model under varying zoom conditions, making it consistent with real broadcast camera behavior.
+
+
+<p align="center">
+  <img src="../rsc/inference_output.gif" width="70%" />
+</p>
+
+
