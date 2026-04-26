@@ -6,7 +6,16 @@ End-to-end pipeline demonstrating how synthetic data generated in Unreal Engine 
 
 
 <p align="center">
-  <img src="rsc/inference_outputV2.gif" width="70%" />
+  <img src="rsc/inference_outputV2.gif" width="75%" />
+</p>
+
+<p align="center">
+  <sub>
+    <strong>Segmentation</strong> →
+    <strong>Line Detection</strong> →
+    <strong>Homography</strong> →
+    <strong>Camera Pose Estimation</strong>
+  </sub>
 </p>
 
 ---
