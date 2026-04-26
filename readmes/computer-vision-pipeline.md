@@ -21,7 +21,7 @@ This README describes the full computer vision pipeline, from dataset consumptio
 
 ---
 
-## Technical Overview
+## 1. Technical Overview
 
 
 This module covers the computer vision pipeline that transforms the synthetic dataset into a functional system capable of understanding the geometry of a tennis court from visual input.
@@ -40,7 +40,7 @@ The diagram below illustrates the full pipeline. In this README, the focus is pl
 
 ---
 
-## Dataset and Problem Definition
+## 2. Dataset and Problem Definition
 
 The dataset used in this project consists of synthetic RGB images and their corresponding segmentation masks, generated using Unreal Engine as described in the previous module.
 
@@ -65,7 +65,7 @@ These intersection points will be used in subsequent stages of the pipeline for 
 
 ---
 
-## Model Arquitecture
+## 3. Model Arquitecture
 
 The segmentation model used in this project is based on **U-Net**, a widely adopted architecture for semantic segmentation tasks.
 
@@ -85,13 +85,13 @@ Another advantage of U-Net is its robustness when working with relatively small 
 
 ---
 
-## Training Strategy and Iterative Improvement
+## 4. Training Strategy and Iterative Improvement
 
 The training process followed an iterative approach, starting from a minimal dataset to validate the full pipeline and progressively increasing complexity based on observed model behavior.
 
 Rather than aiming for maximum performance from the beginning, the focus was on building a reliable workflow that allowed rapid experimentation, error analysis, and controlled improvements.
 
-### Initial Training (Version 0)
+### 4.1 Initial Training (Version 0)
 
 The first version of the model was trained using a small synthetic dataset:
 
@@ -121,7 +121,7 @@ Despite the limited dataset, the model was able to learn the basic structure of 
 </p>
 
 
-### Error Analysis and Dataset Expansion + Fine-Tuning (Version 1)
+### 4.2 Error Analysis and Dataset Expansion + Fine-Tuning (Version 1)
 
 To guide further improvements, a set of inference tests was performed on unseen frames. Approximately 10 samples were analyzed to identify consistent failure patterns.
 
@@ -177,7 +177,7 @@ Result:
 This stage showed a clear improvement in both segmentation quality and structural consistency.
 
 
-### Final Dataset & Model Refinement + Fine-Tuning (Version 2)
+### 4.3 Final Dataset & Model Refinement + Fine-Tuning (Version 2)
 
 To further improve performance, a final dataset expansion was performed with a stronger focus on structural variability.
 
@@ -209,7 +209,7 @@ For the final fine-tuning the training setup was:
 </p>
 
 
-### Key Observations
+### 4.4 Key Observations
 - Starting with a small dataset enabled rapid validation of the full pipeline
 - Iterative dataset refinement was more effective than generating large amounts of data upfront
 - Allowing the full model to adapt (no layer freezing) improved overall performance
@@ -218,7 +218,7 @@ For the final fine-tuning the training setup was:
 
 ---
 
-## Inference, Geometric Reconstruction and Camera Pose Estimation
+## 5. Inference, Geometric Reconstruction and Camera Pose Estimation
 
 The objective of the inference stage is to transform the segmentation output of the model into meaningful geometric information, ultimately enabling camera pose estimation.
 
@@ -232,7 +232,7 @@ The process is composed of the following steps:
 - **Recovery** of camera parameters from the geometric transformation
 
 
-### Line Extraction from Segmentation
+### 5.1 Line Extraction from Segmentation
 
 The predicted segmentation mask is first converted into a set of geometric line representations.
 
@@ -256,7 +256,7 @@ This step transforms noisy pixel predictions into stable geometric primitives.
 </p>
 
 
-### Intersection Detection
+### 5.2 Intersection Detection
 
 Once the lines are extracted, their intersections are computed.
 
@@ -277,7 +277,7 @@ This produces a set of 2D image points corresponding to key court locations.
 </p>
 
 
-### Homography Estimation + Perspective Transformation
+### 5.3 Homography Estimation + Perspective Transformation
 
 With the detected intersection points, the geometric relationship between the image plane and the tennis court is modeled using a [Homography](https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html)
 
@@ -304,9 +304,9 @@ The warped output provides a 2D representation where the court geometry is appro
   <img src="../rsc/Warp_Perspective.png" width = "70%"/>
 </p>
 
-### Camera Pose Estimation from Homography
+### 5.4 Camera Pose Estimation from Homography
 
-Given a computed Homography matrix H, the goal os this stage is to recover the intrinsic and extrinsic parameters of the camera under the planar scene assumption (Z=0).
+Given a computed Homography matrix **H**, the goal os this stage is to recover the intrinsic and extrinsic parameters of the camera under the planar scene assumption **Z=0**.
 We can express the homography that relates a world plane to the 2D image as:
 
 $$
@@ -314,13 +314,13 @@ H = K [r_1 \; r_2 \; t]
 $$
 
 where:
-- K is the intrinsic camera matrix
-- r1,r2 are the first two columns of the rotation matrix
-- t is the translation vector
+- **K**: intrinsic camera matrix
+- **r1,r2**: rotation matrix
+- **t**: translation vector
 
-*This formulation implies that the system has 8 degrees of freedom, which requires at least 4 points correspondences to be fully constrained.*
+#### 5.4.1 Intrinsic Estimation
 
-To calculate the **instrinsic parameter estimation**, we are going to define the instrinsic Matrix as K, parameterized as:
+The intrinsic matrix is defined as:
 
 $$
 K=
@@ -331,67 +331,59 @@ f & 0 & c_x \\
 \end{bmatrix}
 $$
 
-We are going to assume the principal point (cx,cy) to lie at the center of the image, and the focal length *f* is unknown.
-
-Instead of assuming a fixed focal length, because at broadceast scenarios the camera lens have dinamic FOVº, is going to be estimated by minimizing a geometric consistency error derived from the *H* decomposition:
-
-- Orthogonality constraint between r1 and r2:
+The focal length f is estimated by enforcing geometric constraints:
 $$
 r_1 \cdot r_2 \approx 0
 $$
 
-- Consistency of their magnitudes:
 $$
 \| r_1\| \approx \|r_2\|
 $$
 
-Finally the optimal focal length is obtained by minimizing a weighted error function:
+The **optimal value** is obtained by minimizing:
 
 $$
 E(f) = (r_1 \cdot r_2)^2 + λ(\|r_1\| - \|r_2\|)^2
 $$
 
-This type of optimization is solved using a bounded scalar minimization strategy, ensuring physically plausible values and avoiding degenerate solutions. Solved with the [scipy](https://scipy.org/es/) function ```minimize_scalar```.
 
-Once the *f* ideal is estimated, the instrinsic matrix **K** is used to isolate the extrinsic components:
+#### 5.4.2 Pose Recovery
 
+The **extrinsic parameters** are recovered as:
 $$
 K^{-1} H = [r_1r_2t]
 $$
 
-Since this decomposition is defined up to scale, a normalization factor *L* is applied:
+After **normalization**:
 
 $$
 L = \frac{1}{\|r_1\|}
 $$
 
-ensuring that the recovered rotation vectors satisfy unit norm constraints.
+The **third axis** and the Initial **Rotation matrix** are computed as:
 
-
-After that we can recover the third rotation axis as:
 $$
-r_3 = r_1r_2
+r_3 = r_1 \times r_2
 $$
-
-forming an initial rotation matrix:
 
 $$
 R = [r_1r_2r_3]
 $$
 
-An extra that can guarentee a physical valid rotation matrix satisfying orthogonality constraints and enforce validity in the special orthohonal group SO(3), the matrix is refined using Singular Value Decomposition:
+
+An extra that can guarentee a physical valid rotation matrix satisfying orthogonality constraints and enforce validity in the special orthohonal group SO(3), the matrix is refined using **Singular Value Decomposition**(SVD):
 
 $$
 R = U\Sigma V^T -> R = UV^T
 $$
 
-To distinguishe the translation between the camera space and the world reference frame we need to calculate the camera position in world coordinates that is derived from the extrinsic relationship:
+To distinguishe the translation between the camera space and the world reference frame we need to calculate the **camera position** in world coordinates that is derived from the extrinsic relationship:
 
 $$
 C = -R^Tt
 $$
 
-Finally, to get all the camera data necessary por the pose estimation is to calculate the FOV, in this case I used de Horizontal FOV because is the same as in Unreal Engine camera properties:
+Finally, to get all the camera data necessary por the pose estimation is to calculate the FOV, in this case I used de **Horizontal FOV** because is the same as in **Unreal Engine** camera properties:
 
 
 $$
@@ -400,9 +392,8 @@ $$
 
 This allows dynamic adaptation of the camera model under varying zoom conditions, making it consistent with real broadcast camera behavior.
 
-
 <p align="center">
-  <img src="../rsc/inference_output.gif" width="70%" />
+  <img src="../rsc/inference_output.gif" width="60%" />
 </p>
 
 

@@ -1,8 +1,12 @@
 ## Synthetic Tennis Vision Pipeline (Deep Learning + Unreal Engine + Computer Vision)
+
+
 End-to-end pipeline demonstrating how synthetic data generated in Unreal Engine can be used to train Neural Networks arquitectures to solve a real problem. For this project we applied this workflow for a tennis match segmenting the court lines for homography estimation, and camera pose reconstruction for AR and broadcast applications.
 
+
+
 <p align="center">
-  <img src="rsc/inference_outputV2.gif" width="80%" />
+  <img src="rsc/inference_outputV2.gif" width="70%" />
 </p>
 
 ---
@@ -76,14 +80,11 @@ To achieve this, the project implements a full pipeline that:
 
 To keep the main README concise and readable, the pipeline is documented in two dedicated sections:
 
-- **Synthetic Data Generation (Unreal Engine)**
-→ [README.md](readmes/data-generation-unreal-engine.md)
-Covers scene setup, rendering pipeline, and automatic annotation.
+- [Synthetic Data Generation - README.md](readmes/data-generation-unreal-engine.md) :
+Covers **scene setup**, **rendering** pipeline, and automatic **annotation**.
 
-- **Camera Pose Estimation Pipeline**
-→ [README.md](readmes/computer-vision-pipeline.md)
-
-*Although both parts were developed iteratively, the documentation is structured in a logical order: data generation → model training → inference pipeline.*
+- [Camera Pose Estimation Pipeline - README.md](readmes/computer-vision-pipeline.md) :
+Covers **training**, **inference** and **Camera Pose** Estimation
 
 ---
 ### Quick Start
@@ -150,6 +151,7 @@ pip install -e .
         ```bash
         video_inference.bat --help
         ```
+---
 
 ## Real-World Application
 
@@ -166,10 +168,11 @@ This project demonstrates how a combination of synthetic data and computer visio
 While the implementation focuses on tennis, the same approach can be applied to other sports and scenarios where scene geometry is known.
 
 <p align="center">
+    <img src="rsc/RealExampleTennis.png" width="48%" />
     <img src="rsc/football.gif" width="45%" />
-    <img src="rsc/football.gif" width="45%" />
-
 </p>
+
+---
 
 ## Acknowledgements
 
@@ -189,6 +192,8 @@ The project is not intended to be a production-ready system, but rather a proof 
 
 It reflects an iterative development process where both the synthetic environment and the model were refined together.
 
+---
+
 ## References
 
 Project was inspired by work in:
@@ -202,6 +207,8 @@ Key references:
 - **Synthetic Data for Deep Learning** - [PAPER](https://arxiv.org/pdf/1909.11512)
 - **Multiple View Geometry in Computer Vision** – [Hartley & Zisserman](http://www.r-5.org/files/books/computers/algo-list/image-processing/vision/Richard_Hartley_Andrew_Zisserman-Multiple_View_Geometry_in_Computer_Vision-EN.pdf)
 - **U-Net-Image-Segmentation** - [AlejandroFontesAlbeza-Repository](https://github.com/AlejandroFontesAlbeza/U-Net-Image-Segmentation)
+
+---
 
 ## License
 

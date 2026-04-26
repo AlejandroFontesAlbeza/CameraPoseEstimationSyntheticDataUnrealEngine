@@ -15,7 +15,7 @@ This module focuses specifically on the data generation pipeline: from scene cre
 
 ---
 
-## Technical Overview
+## 1. Technical Overview
 
 This project is structured as an end-to-end pipeline that integrates synthetic data generation, deep learning, and real-time rendering.
 
@@ -29,7 +29,7 @@ The purpose of this section is to provide a simplified view of how each componen
 
 ---
 
-## Why Unreal Engine?
+## 2. Why Unreal Engine?
 
 Unreal Engine was selected as the core platform for synthetic data generation due to its ability to provide full control over the visual environment, combined with high-fidelity rendering and flexible automation capabilities.
 
@@ -43,7 +43,7 @@ From a practical perspective, prior experience with the engine also enabled fast
 
 ---
 
-## Data Generation Strategy
+## 3. Data Generation Strategy
 
 The data generation strategy in this project is intentionally scoped to a controlled and well-defined scenario. Since this is a personal project aimed at validating the feasibility of synthetic data pipelines, the focus is not on building a fully generalized dataset, but rather on replicating a specific real-world setup with sufficient variability to enable model generalization within that context.
 
@@ -67,9 +67,9 @@ However, for the purpose of this project, the objective is more focused: to demo
 
 ---
 
-## Synthetic Scene Design and Domain Randomization
+## 4. Synthetic Scene Design and Domain Randomization
 
-### 1. Overview
+### 4.1 Overview
 
 This section describes how the synthetic tennis court environment was configured and how the data generation process was automated. The focus is on the factors that influence model generalization rather than on 3D asset creation, as the goal is to generate a dataset tailored to a specific scenario.
 
@@ -80,7 +80,7 @@ The reference scenario is a broadcast view of the Australian Open match between 
 </p>
 
 
-### 2. Scene Setup
+### 4.2 Scene Setup
 
 The tennis court was modeled based on official dimensions, with the origin (0,0,0) set at the center of the court. Key elements included:
 <p align="center">
@@ -102,7 +102,7 @@ The tennis court was modeled based on official dimensions, with the origin (0,0,
     <img src="../rsc/Audience.png" width="25%" height="170" />
 </p>
 
-### 3. Domain Randomization
+### 4.3 Domain Randomization
 
 
 To improve the robustness and generalization capability of the segmentation model, controlled variability was introduced across multiple aspects of the scene. Rather than relying on a single static configuration, the environment was systematically perturbed to simulate the natural variations observed in real tennis broadcasts.
@@ -111,7 +111,7 @@ The goal of this process is to prevent the model from overfitting to specific vi
 
 All variations were implemented using Unreal Engine’s Blueprint system, specifically within the Level Blueprint, allowing procedural control over scene parameters at runtime.
 
-**3.1 Lighting Variation**
+**4.3.1 Lighting Variation**
 
 Lighting conditions in real tennis matches can vary significantly depending on the time of day, weather conditions, and stadium configuration. Even within the same match, lighting can change due to camera exposure adjustments or partial shadows.
 
@@ -134,7 +134,7 @@ Lighting parameters were randomized through the Level Blueprint, enabling differ
     <img src="../rsc/render3frame0061.png" width="40%" />
 </p>
 
-**3.2 Player and Ball Variation**
+**4.3.2 Player and Ball Variation**
 
 In real scenarios, player positions and ball movement are highly dynamic and unpredictable. Even without full animation, introducing spatial variability is critical to avoid learning fixed scene configurations.
 
@@ -157,7 +157,7 @@ Actor transforms (location and rotation) were randomized through the Level Bluep
     <img src="../rsc/BallVariability04.png"  width="20%" height="150"/>
 </p>
 
-**3.3 Secondary Elements Variation**
+**4.3.3 Secondary Elements Variation**
 
 In addition to primary actors, secondary scene elements were also varied to better approximate real broadcast conditions and avoid introducing static visual patterns.
 
@@ -182,7 +182,7 @@ Placement and visibility of these elements were controlled via the Level Bluepri
     <img src="../rsc/RotulationVariability.png"  width="20%" height="150"/>
 </p>
 
-**3.4 Court Line & Tennis Net Variability**
+**4.3.4 Court Line & Tennis Net Variability**
 
 Although tennis courts & net follow strict regulations, visual variations still exist in real-world conditions due to wear, repainting, and camera perception.
 
@@ -204,7 +204,7 @@ Material parameters were adjusted dynamically through the Level Blueprint, allow
 </p>
 
 
-**3.5 Court Surface and Background Color Variation**
+**4.3.5 Court Surface and Background Color Variation**
 
 In real-world scenarios, the appearance of the tennis court can vary significantly depending on the tournament, lighting conditions, camera settings, and surface material. Even within the same court, perceived color can shift due to exposure, shadows, and broadcast processing.
 
@@ -224,10 +224,11 @@ Material parameters controlling color were dynamically adjusted through the Leve
     <img src="../rsc/FloorColor02.png" width="30%" height="200"/>
 </p>
 
+---
 
-### 4. Rendering Pipeline and Dataset Generation
+### 5. Rendering Pipeline and Dataset Generation
 
-**4.1 Segmentation Mask Generation (Stencil Buffer + Post-Processing)**
+**5.1 Segmentation Mask Generation (Stencil Buffer + Post-Processing)**
 
 To generate accurate segmentation labels, Unreal Engine’s stencil buffer was used in combination with a custom post-processing (PP) material.
 
@@ -255,7 +256,7 @@ The use of a post-processing material is critical, as it allows overriding the f
     <img src="../rsc/StencilMatView.png" width="40%" height="220"/>
 </p>
 
-**4.2 Automated Rendering with Level Sequences and Movie Render Queue**
+**5.2 Automated Rendering with Level Sequences and Movie Render Queue**
 
 The dataset generation process was implemented using Unreal Engine’s Level Sequencer and Movie Render Queue, enabling automated and reproducible rendering.
 
@@ -284,10 +285,10 @@ This approach allowed introducing controlled variability in viewpoint while keep
 </p>
 
 
-**Rendering Pipeline**
+**5.3Rendering Pipeline**
 The rendering process was executed in two stages using the Movie Render Queue:
 
-**1. RGB Image Generation**
+**5.3.1. RGB Image Generation**
 - No post-processing applied
 - Output stored in:
     ``renderUE/images/``
@@ -297,7 +298,7 @@ The rendering process was executed in two stages using the Movie Render Queue:
     <img src="../rsc/ImageSequencer.png" width="40%""/>
 </p>
 
-**2. Segmentation Mask Generation**
+**5.3.2. Segmentation Mask Generation**
 - Post-processing material enabled (stencil visualization)
 - Same sequences rendered again
 - Output stored in:
@@ -317,11 +318,11 @@ The rendering process was executed in two stages using the Movie Render Queue:
 
 ---
 
-## Limitations and Future Improvements
+## 6. Limitations and Future Improvements
 
 While the current implementation successfully demonstrates the feasibility of using synthetic data for training a segmentation model, it is important to acknowledge its limitations and outline potential improvements for scaling the approach.
 
-### Current Limitations
+### 6.1 Current Limitations
 
 - **Limited scenario scope**
 The dataset is based on a single reference setup inspired by a specific broadcast scenario. As a result, the model may struggle to generalize to different tournaments, court types, or camera styles.
@@ -333,7 +334,7 @@ Players and secondary elements are represented using static poses rather than fu
 Although domain randomization was applied, it remains constrained compared to the diversity present in real-world data distributions.
 
 
-### Future Improvements
+### 6.2 Future Improvements
 
 To extend this approach towards a production-level system, several enhancements could be implemented:
 
@@ -357,11 +358,11 @@ To extend this approach towards a production-level system, several enhancements 
     - Automated dataset balancing
 
 ---
-## Unreal Engine Project Access
+## 7. Download UProject
 
 The full Unreal Engine project used for synthetic data generation is available at the following link:
 
-👉 [UProject](link)
+👉 [UProject](https://drive.google.com/file/d/1mb0NPwv27Z4TiGMSy594WlGWT0dTwCwh/view?usp=sharing)
 
 **This includes:**
 
@@ -374,7 +375,7 @@ The full Unreal Engine project used for synthetic data generation is available a
 
 ---
 
-## Conclusion
+## 8. Conclusion
 
 This part of the project demonstrates that synthetic data generation using a 3D engine can be a viable alternative to manual dataset annotation for computer vision tasks such as semantic segmentation.
 
