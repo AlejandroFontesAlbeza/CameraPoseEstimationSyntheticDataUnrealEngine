@@ -81,7 +81,7 @@ This makes it well-suited for the problem at hand, where the objective is not on
 
 Another advantage of U-Net is its robustness when working with relatively small datasets, which aligns with the iterative training strategy followed in this project.
 
-*Note: This README focuses on the application of the model within the pipeline. A more detailed explanation of the U-Net architecture can be found in the following repository 👉 [Repo](https://github.com/AlejandroFontesAlbeza/U-Net-Image-Segmentation)
+*Note: This README focuses on the application of the model within the pipeline. A more detailed explanation of the U-Net architecture can be found in the following repository* 👉 [Repo](https://github.com/AlejandroFontesAlbeza/U-Net-Image-Segmentation)
 
 ---
 

@@ -1,5 +1,11 @@
 ## Synthetic Tennis Vision Pipeline (Deep Learning + Unreal Engine + Computer Vision)
 
+![Python](https://img.shields.io/badge/Python-blue?logo=python&logoColor=yellow) ![Pytorch](https://img.shields.io/badge/Pytorch-red?logo=pytorch&logoColor=yellow) ![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-grey?&logo=unrealengine&logoColor=white&labelColor=black) ![MIT](https://img.shields.io/badge/license-grey)![Static Badge](https://img.shields.io/badge/MIT%20License-green)
+
+
+
+
+
 
 End-to-end pipeline demonstrating how synthetic data generated in Unreal Engine can be used to train Neural Networks arquitectures to solve a real problem. For this project we applied this workflow for a tennis match segmenting the court lines for homography estimation, and camera pose reconstruction for AR and broadcast applications.
 
